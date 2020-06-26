@@ -89,4 +89,26 @@ class PresenterIntegrationTest {
         //  Assert
         assertNotNull(view.error)
     }
+
+    @Test
+    fun `Copy Credentials is Resistant to Model Finalizer`() {
+        //  Arrange
+        val file = SFSTestingUtils.getTestFile("testFile")
+        val sfs = SFSTestingUtils.getNewSecureFileSystem(file)
+        sfs.touch("testFile1")
+        val credentials = SFSCredentials(file,
+            SecureFileSystem.generatePassword(SecureString("password123".toByteArray())))
+
+        val model = TestModel(credentials)
+        val view = TestView()
+        val presenter = TestPresenter(model, view)
+        presenter.start()
+
+        //  Act
+        val copyCredentials = model.copyCredentials()
+        presenter.close()
+
+        //  Assert
+        assertFalse(copyCredentials.finalized())
+    }
 }
