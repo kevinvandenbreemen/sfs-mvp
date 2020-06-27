@@ -37,6 +37,7 @@ abstract class PresenterManager {
 
     fun destroyPresenters() {
         presenters.forEach { it.close() }
+        presenters.clear()
     }
 
 }

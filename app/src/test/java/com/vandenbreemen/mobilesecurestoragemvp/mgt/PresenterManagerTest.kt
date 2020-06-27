@@ -93,6 +93,57 @@ class PresenterManagerTest {
     }
 
     @Test(expected = RuntimeException::class)
+    fun `Clears the Presenters List on Destroy Presenters`() {
+        //  Arrange
+        val file = SFSTestingUtils.getTestFile("testFile")
+        val sfs = SFSTestingUtils.getNewSecureFileSystem(file)
+        sfs.touch("testFile1")
+        val credentials = SFSCredentials(file,
+            SecureFileSystem.generatePassword(SecureString("password123".toByteArray())))
+        val manager = TestPresenterManager()
+        manager.buildPresenters(credentials)
+        var presenter: TestPresenterWithNoView = manager.getPresenter()
+        val view = TestView()
+        presenter.setView(view)
+
+        presenter.start()
+
+        manager.destroyPresenters()
+
+        //  Act
+        presenter = manager.getPresenter()
+
+        //  Assert
+        fail("Should not have gotten here")
+
+    }
+
+    @Test
+    fun `Clears the Presenters Even if Presenters Not Started`() {
+        //  Arrange
+        val file = SFSTestingUtils.getTestFile("testFile")
+        val sfs = SFSTestingUtils.getNewSecureFileSystem(file)
+        sfs.touch("testFile1")
+        val credentials = SFSCredentials(file,
+            SecureFileSystem.generatePassword(SecureString("password123".toByteArray())))
+        val manager = TestPresenterManager()
+        manager.buildPresenters(credentials)
+        manager.destroyPresenters()
+
+        //  Act
+        try {
+            val presenter: TestPresenterWithNoView = manager.getPresenter()
+        } catch (rtx: RuntimeException) {
+            rtx.printStackTrace()
+            return
+        }
+
+        //  Assert
+        fail("Should not have gotten here")
+
+    }
+
+    @Test(expected = RuntimeException::class)
     fun `Throws an Error when Requesting a Type that is Not Supported`() {
         //  Arrange
         val file = SFSTestingUtils.getTestFile("testFile")

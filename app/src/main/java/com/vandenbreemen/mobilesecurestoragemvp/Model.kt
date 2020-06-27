@@ -30,7 +30,10 @@ abstract class Model(private val credentials: SFSCredentials) {
             return
         }
         credentials.finalize()
-        sfs.close()
+        if(::sfs.isInitialized) {
+            sfs.close()
+        }
+
         onClose()
     }
 
