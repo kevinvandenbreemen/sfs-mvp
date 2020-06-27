@@ -8,6 +8,7 @@ import com.vandenbreemen.mobilesecurestoragemvp.TestModel
 import com.vandenbreemen.mobilesecurestoragemvp.TestPresenter
 import com.vandenbreemen.mobilesecurestoragemvp.TestView
 import com.vandenbreemen.sfs_test_utils.SFSTestingUtils
+import junit.framework.TestCase
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -65,6 +66,30 @@ class PresenterManagerTest {
         //  Assert
         assertNotNull(presenter)
 
+    }
+
+    @Test
+    fun `Destroys Presenters`() {
+        //  Arrange
+        val file = SFSTestingUtils.getTestFile("testFile")
+        val sfs = SFSTestingUtils.getNewSecureFileSystem(file)
+        sfs.touch("testFile1")
+        val credentials = SFSCredentials(file,
+            SecureFileSystem.generatePassword(SecureString("password123".toByteArray())))
+        val manager = TestPresenterManager()
+        manager.buildPresenters(credentials)
+        val presenter: TestPresenterWithNoView = manager.getPresenter()
+        val view = TestView()
+        presenter.setView(view)
+
+        presenter.start()
+        manager.destroyPresenters()
+
+        //  Act
+        presenter.start()
+
+        //  Assert
+        assertNotNull(view.error)
     }
 
     @Test(expected = RuntimeException::class)
