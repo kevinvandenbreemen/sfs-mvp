@@ -6,7 +6,18 @@ import com.vandenbreemen.mobilesecurestorage.message.ApplicationError
  * Presenter.  This is the fundamental orchestrator in the MVP system
  * @author kevin
  */
-abstract class Presenter<MODEL: Model, VIEW: View>(private val model: MODEL, private val view: VIEW) {
+abstract class Presenter<MODEL: Model, VIEW: View>(private val model: MODEL, private var view: VIEW? = null) {
+
+    /**
+     * Sets the view on this presenter.  Only call this method before calling [start]
+     */
+    fun setView(view: VIEW) {
+        this.view = view
+    }
+
+    protected fun getView(): VIEW? {
+        return this.view
+    }
 
     /**
      * Starts up the logic in this presenter.  This method will also initialize needed model and by
@@ -17,7 +28,7 @@ abstract class Presenter<MODEL: Model, VIEW: View>(private val model: MODEL, pri
             model.init()
             setupView()
         } catch (exception: Exception) {
-            view.showError(ApplicationError("Unexpected Error Occurred"))
+            view?.showError(ApplicationError("Unexpected Error Occurred"))
         }
     }
 
