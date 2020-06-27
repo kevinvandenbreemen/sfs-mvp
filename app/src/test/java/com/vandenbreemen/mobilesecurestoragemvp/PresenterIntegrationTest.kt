@@ -4,6 +4,7 @@ import com.vandenbreemen.mobilesecurestorage.android.sfs.SFSCredentials
 import com.vandenbreemen.mobilesecurestorage.message.ApplicationError
 import com.vandenbreemen.mobilesecurestorage.security.SecureString
 import com.vandenbreemen.mobilesecurestorage.security.crypto.persistence.SecureFileSystem
+import com.vandenbreemen.mobilesecurestoragemvp.mgt.TestPresenterWithNoView
 import com.vandenbreemen.sfs_test_utils.SFSTestingUtils
 import junit.framework.TestCase.*
 import org.junit.Test
@@ -110,5 +111,23 @@ class PresenterIntegrationTest {
 
         //  Assert
         assertFalse(copyCredentials.finalized())
+    }
+
+    @Test
+    fun `Can set Views Later`() {
+        val file = SFSTestingUtils.getTestFile("testFile")
+        val sfs = SFSTestingUtils.getNewSecureFileSystem(file)
+        sfs.touch("testFile1")
+        val credentials = SFSCredentials(file,
+            SecureFileSystem.generatePassword(SecureString("password123".toByteArray())))
+
+        val model = TestModel(credentials)
+        val view = TestView()
+        val presenter = TestPresenterWithNoView(model)
+        presenter.setView(view)
+        presenter.start()
+
+        assertEquals(listOf("testFile1"), view.sfsFileList)
+        assertNull(view.error)
     }
 }

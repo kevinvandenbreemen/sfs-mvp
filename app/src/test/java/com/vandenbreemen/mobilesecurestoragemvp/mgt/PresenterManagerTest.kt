@@ -24,7 +24,7 @@ class TestPresenterManager: PresenterManager() {
 class TestPresenterWithNoView(private val model: TestModel): Presenter<TestModel, TestView>(model) {
 
     override fun setupView() {
-
+        getView()?.showFiles(model.listFiles())
     }
 }
 
