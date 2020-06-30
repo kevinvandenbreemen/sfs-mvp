@@ -1,9 +1,9 @@
 package com.vandenbreemen.mobilesecurestoragemvp
 
 import com.vandenbreemen.mobilesecurestorage.android.sfs.SFSCredentials
-import com.vandenbreemen.mobilesecurestorage.log.SystemLog
 import com.vandenbreemen.mobilesecurestorage.security.SecureString
 import com.vandenbreemen.mobilesecurestorage.security.crypto.persistence.SecureFileSystem
+import com.vandenbreemen.standardandroidlogging.log.SystemLog
 
 abstract class Model(private val credentials: SFSCredentials) {
 
