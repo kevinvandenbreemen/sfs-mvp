@@ -9,7 +9,7 @@ android {
         minSdkVersion 27
         targetSdkVersion 29
         versionCode 1
-        versionName "1.0.1.1100"
+        versionName "1.0.1.1200"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -24,7 +24,7 @@ android {
 
 dependencies {
 
-    implementation 'com.github.kevinvandenbreemen:standard-android-logging:1.0.0.1000'
+    implementation 'com.github.kevinvandenbreemen:standard-android-logging:1.0.0.1100'
     implementation 'com.github.kevinvandenbreemen:NewCryptoFramework:1.1.2.1001'
     implementation 'com.github.kevinvandenbreemen:sfs-android-integration:1.0.0.1000'
 
