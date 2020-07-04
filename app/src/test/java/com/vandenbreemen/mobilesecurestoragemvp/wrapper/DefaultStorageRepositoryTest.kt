@@ -115,6 +115,16 @@ class DefaultStorageRepositoryTest {
     }
 
     @Test
+    fun `should get file info`() {
+        repository.store("test2", "This is a test")
+        val info = repository.stat("test2")
+
+        assertEquals("test2", info.fileName)
+        assertNotNull(info.createDate)
+        assertEquals(1, info.size)
+    }
+
+    @Test
     fun `Should unmount`() {
         repository.store("test1", "This is a test")
         repository.unmount()

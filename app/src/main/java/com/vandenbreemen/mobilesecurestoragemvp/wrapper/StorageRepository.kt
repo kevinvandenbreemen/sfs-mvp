@@ -1,10 +1,7 @@
 package com.vandenbreemen.mobilesecurestoragemvp.wrapper
 
 import com.vandenbreemen.mobilesecurestorage.file.ImportedFileData
-import com.vandenbreemen.mobilesecurestorage.file.api.FileType
-import com.vandenbreemen.mobilesecurestorage.file.api.FileTypes
-import com.vandenbreemen.mobilesecurestorage.file.api.SecureFileSystemInteractor
-import com.vandenbreemen.mobilesecurestorage.file.api.SecureFileSystemInteractorFactory
+import com.vandenbreemen.mobilesecurestorage.file.api.*
 import com.vandenbreemen.mobilesecurestorage.security.crypto.persistence.SecureFileSystem
 import com.vandenbreemen.mobilesecurestoragemvp.wrapper.error.RepositoryRuntime
 import java.io.Serializable
@@ -28,6 +25,7 @@ interface StorageRepository {
     fun unmount()
     fun mv(currentName: String, newName: String)
     fun delete(vararg fileNames: String)
+    fun stat(fileName: String): FileInfo
 
 }
 
@@ -98,6 +96,10 @@ class DefaultStorageRepository(private var secureFileSystem: SecureFileSystem?) 
     override fun lsc(fileType: FileTypes?): Int {
         checkMounted()
         return ls(fileType).count()
+    }
+
+    override fun stat(fileName: String): FileInfo {
+        return interactor.info(fileName)
     }
 
     override fun unmount() {
