@@ -2,6 +2,7 @@ package com.vandenbreemen.mobilesecurestoragemvp.wrapper
 
 import com.vandenbreemen.mobilesecurestorage.file.ImportedFileData
 import com.vandenbreemen.mobilesecurestorage.security.crypto.persistence.SecureFileSystem
+import com.vandenbreemen.mobilesecurestoragemvp.wrapper.error.RepositoryRuntime
 import java.io.Serializable
 import java.util.*
 
@@ -17,31 +18,55 @@ interface StorageRepository {
     fun ls(): List<String>
     fun lsc(): Int
 
+    /**
+     * Unmount the file system.  The StorageRepository will no longer be usable!
+     */
+    fun unmount()
+
 }
 
-class DefaultStorageRepository(private val secureFileSystem: SecureFileSystem) : StorageRepository {
+class DefaultStorageRepository(private var secureFileSystem: SecureFileSystem?) : StorageRepository {
+
+    @Throws(RepositoryRuntime::class)
+    private fun checkMounted() {
+        if(secureFileSystem == null) {
+            throw RepositoryRuntime("File system no longer mounted")
+        }
+    }
+
     override fun store(fileName: String, data: Serializable) {
-        secureFileSystem.storeObject(fileName, data)
+        checkMounted()
+        secureFileSystem!!.storeObject(fileName, data)
     }
 
     override fun load(fileName: String): Any {
-        return secureFileSystem.loadAndCacheFile(fileName)
+        checkMounted()
+        return secureFileSystem!!.loadAndCacheFile(fileName)
     }
 
     override fun storeBytes(fileName: String, byteArray: ByteArray) {
+        checkMounted()
         val importedData = ImportedFileData(byteArray)
-        secureFileSystem.storeObject(fileName, importedData)
+        secureFileSystem!!.storeObject(fileName, importedData)
     }
 
     override fun loadBytes(fileName: String): ByteArray? {
-        return secureFileSystem.loadAndCacheBytesFromFile(fileName)
+        checkMounted()
+        return secureFileSystem!!.loadAndCacheBytesFromFile(fileName)
     }
 
     override fun ls(): List<String> {
-        return Collections.unmodifiableList(secureFileSystem.listFiles())
+        checkMounted()
+        return Collections.unmodifiableList(secureFileSystem!!.listFiles())
     }
 
     override fun lsc(): Int {
-        return secureFileSystem.listFiles().count()
+        checkMounted()
+        return secureFileSystem!!.listFiles().count()
+    }
+
+    override fun unmount() {
+        secureFileSystem!!.close()
+        secureFileSystem = null
     }
 }

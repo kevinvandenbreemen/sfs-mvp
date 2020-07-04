@@ -1,8 +1,8 @@
 package com.vandenbreemen.mobilesecurestoragemvp.wrapper
 
+import com.vandenbreemen.mobilesecurestoragemvp.wrapper.error.RepositoryRuntime
 import com.vandenbreemen.sfs_test_utils.SFSTestingUtils
-import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertTrue
+import junit.framework.TestCase.*
 import org.junit.Assert.assertArrayEquals
 import org.junit.Before
 import org.junit.Test
@@ -57,6 +57,19 @@ class DefaultStorageRepositoryTest {
         repository.storeBytes("test2", byteArray)
 
         assertEquals(2, repository.lsc())
+    }
+
+    @Test
+    fun `Should unmount`() {
+        repository.store("test1", "This is a test")
+        repository.unmount()
+
+        try {
+            repository.lsc()
+            fail("Repository unmounted")
+        } catch(rex: RepositoryRuntime){
+            rex.printStackTrace()
+        }
     }
 
 }
