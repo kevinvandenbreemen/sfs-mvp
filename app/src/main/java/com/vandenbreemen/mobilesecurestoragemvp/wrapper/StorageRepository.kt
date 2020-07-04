@@ -22,6 +22,7 @@ interface StorageRepository {
      * Unmount the file system.  The StorageRepository will no longer be usable!
      */
     fun unmount()
+    fun mv(currentName: String, newName: String)
 
 }
 
@@ -68,5 +69,10 @@ class DefaultStorageRepository(private var secureFileSystem: SecureFileSystem?) 
     override fun unmount() {
         secureFileSystem!!.close()
         secureFileSystem = null
+    }
+
+    override fun mv(currentName: String, newName: String) {
+        checkMounted()
+        secureFileSystem!!.rename(currentName, newName)
     }
 }

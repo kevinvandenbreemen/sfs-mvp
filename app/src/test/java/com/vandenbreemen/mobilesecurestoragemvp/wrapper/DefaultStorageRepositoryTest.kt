@@ -60,6 +60,14 @@ class DefaultStorageRepositoryTest {
     }
 
     @Test
+    fun `should rename files`() {
+        repository.store("test1", "This is a test")
+        repository.mv("test1", "renamed")
+        val storedData = repository.load("renamed")
+        assertEquals("This is a test", storedData)
+    }
+
+    @Test
     fun `Should unmount`() {
         repository.store("test1", "This is a test")
         repository.unmount()
