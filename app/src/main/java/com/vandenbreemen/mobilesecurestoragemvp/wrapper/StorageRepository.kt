@@ -1,9 +1,12 @@
 package com.vandenbreemen.mobilesecurestoragemvp.wrapper
 
+import com.vandenbreemen.mobilesecurestorage.file.FileLoader
+import com.vandenbreemen.mobilesecurestorage.file.FileLoaderFactory.Companion.getFileImporter
 import com.vandenbreemen.mobilesecurestorage.file.ImportedFileData
 import com.vandenbreemen.mobilesecurestorage.file.api.*
 import com.vandenbreemen.mobilesecurestorage.security.crypto.persistence.SecureFileSystem
 import com.vandenbreemen.mobilesecurestoragemvp.wrapper.error.RepositoryRuntime
+import java.io.File
 import java.io.Serializable
 import java.util.*
 
@@ -13,7 +16,7 @@ import java.util.*
  */
 interface StorageRepository {
     fun store(fileName: String, data: Serializable, fileType: FileType? = null)
-    fun load(fileName: String): Any
+    fun load(fileName: String): Any?
     fun storeBytes(fileName: String, byteArray: ByteArray, fileType: FileTypes? = null)
     fun loadBytes(fileName: String): ByteArray?
     fun ls(fileType: FileType? = null): List<String>
@@ -26,12 +29,17 @@ interface StorageRepository {
     fun mv(currentName: String, newName: String)
     fun delete(vararg fileNames: String)
     fun stat(fileName: String): FileInfo
+    fun import(fileName: String, destinationFileName: String)
+    fun f(fileName: String): Boolean
 
 }
 
 class DefaultStorageRepository(private var secureFileSystem: SecureFileSystem?) : StorageRepository {
 
     private var interactor: SecureFileSystemInteractor = SecureFileSystemInteractorFactory.get(secureFileSystem!!)
+    private val fileLoader: FileLoader by lazy {
+        getFileImporter()
+    }
 
     @Throws(RepositoryRuntime::class)
     private fun checkMounted() {
@@ -51,9 +59,23 @@ class DefaultStorageRepository(private var secureFileSystem: SecureFileSystem?) 
         secureFileSystem!!.storeObject(fileName, data)
     }
 
-    override fun load(fileName: String): Any {
+    /**
+     * Check if file with the given name exists
+     */
+    override fun f(fileName: String): Boolean {
         checkMounted()
-        return secureFileSystem!!.loadAndCacheFile(fileName)
+        return secureFileSystem!!.exists(fileName)
+    }
+
+    override fun load(fileName: String): Any? {
+        if(!f(fileName)) {
+            return null
+        }
+        val data = secureFileSystem!!.loadAndCacheFile(fileName)
+        if(data is ImportedFileData) {
+            return data.fileData
+        }
+        return data
     }
 
     override fun storeBytes(
@@ -73,7 +95,9 @@ class DefaultStorageRepository(private var secureFileSystem: SecureFileSystem?) 
     }
 
     override fun loadBytes(fileName: String): ByteArray? {
-        checkMounted()
+        if(!f(fileName)) {
+            return null
+        }
         return secureFileSystem!!.loadAndCacheBytesFromFile(fileName)
     }
 
@@ -100,6 +124,15 @@ class DefaultStorageRepository(private var secureFileSystem: SecureFileSystem?) 
 
     override fun stat(fileName: String): FileInfo {
         return interactor.info(fileName)
+    }
+
+    override fun import(fileName: String, destinationFileName: String) {
+        val file = File(fileName)
+        if(!file.exists()){
+            return
+        }
+        val data = fileLoader.loadFile(file)
+        interactor.importToFile(data, destinationFileName, null)
     }
 
     override fun unmount() {

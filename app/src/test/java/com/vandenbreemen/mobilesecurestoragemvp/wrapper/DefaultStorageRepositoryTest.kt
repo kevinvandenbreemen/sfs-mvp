@@ -7,6 +7,7 @@ import junit.framework.TestCase.*
 import org.junit.Assert.assertArrayEquals
 import org.junit.Before
 import org.junit.Test
+import java.io.File
 
 /**
  * @author kevin
@@ -122,6 +123,28 @@ class DefaultStorageRepositoryTest {
         assertEquals("test2", info.fileName)
         assertNotNull(info.createDate)
         assertEquals(1, info.size)
+    }
+
+    @Test
+    fun `should import data into files`() {
+        val path = "src/test/resource/testdata.dat"
+        val testFile = File(path)
+        assertTrue(testFile.exists())
+
+        repository.import(path, "test1")
+
+        val data = repository.load("test1")
+        assertTrue(data is ByteArray)
+
+        val string = String(data as ByteArray)
+        assertEquals("THIS IS A TEST", string)
+    }
+
+    @Test
+    fun `should check if file exists`() {
+        assertFalse(repository.f("test1"))
+        repository.store("test1", "This is a test", FileTypes.DATA)
+        assertTrue(repository.f("test1"))
     }
 
     @Test

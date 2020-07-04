@@ -29,7 +29,7 @@ android {
 dependencies {
 
     implementation 'com.github.kevinvandenbreemen:standard-android-logging:1.0.0.1100'
-    implementation 'com.github.kevinvandenbreemen:NewCryptoFramework:1.1.2.1200'
+    implementation 'com.github.kevinvandenbreemen:NewCryptoFramework:1.1.2.1220'
     implementation 'com.github.kevinvandenbreemen:sfs-android-integration:1.0.0.1000'
 
     implementation fileTree(dir: "libs", include: ["*.jar"])
