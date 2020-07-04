@@ -17,7 +17,7 @@ import java.util.*
 interface StorageRepository {
     fun store(fileName: String, data: Serializable, fileType: FileType? = null)
     fun load(fileName: String): Any
-    fun storeBytes(fileName: String, byteArray: ByteArray)
+    fun storeBytes(fileName: String, byteArray: ByteArray, fileType: FileTypes? = null)
     fun loadBytes(fileName: String): ByteArray?
     fun ls(fileType: FileType? = null): List<String>
     fun lsc(fileType: FileTypes? = null): Int
@@ -57,9 +57,19 @@ class DefaultStorageRepository(private var secureFileSystem: SecureFileSystem?) 
         return secureFileSystem!!.loadAndCacheFile(fileName)
     }
 
-    override fun storeBytes(fileName: String, byteArray: ByteArray) {
+    override fun storeBytes(
+        fileName: String,
+        byteArray: ByteArray,
+        fileType: FileTypes?
+    ) {
         checkMounted()
         val importedData = ImportedFileData(byteArray)
+
+        fileType?.let { ft->
+            interactor.save(importedData, fileName, ft)
+            return
+        }
+
         secureFileSystem!!.storeObject(fileName, importedData)
     }
 

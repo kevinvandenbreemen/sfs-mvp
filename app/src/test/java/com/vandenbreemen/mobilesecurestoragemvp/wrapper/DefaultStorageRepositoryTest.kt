@@ -32,7 +32,21 @@ class DefaultStorageRepositoryTest {
     @Test
     fun `should store byte array`() {
         val byteArray: ByteArray = "Hello world".toByteArray()
-        repository.storeBytes("test1", byteArray)
+        repository.storeBytes("test1", byteArray, null)
+        val storedData = repository.loadBytes("test1")
+
+        assertArrayEquals(storedData, "Hello world".toByteArray())
+    }
+
+    @Test
+    fun `should store byte array with file type`() {
+        val byteArray: ByteArray = "Hello world".toByteArray()
+        repository.storeBytes("test1", byteArray, FileTypes.SYSTEM)
+        repository.store("test2", "This is a test")
+
+        assertEquals(1, repository.lsc(FileTypes.SYSTEM))
+        assertEquals(2, repository.lsc())
+
         val storedData = repository.loadBytes("test1")
 
         assertArrayEquals(storedData, "Hello world".toByteArray())
@@ -42,7 +56,7 @@ class DefaultStorageRepositoryTest {
     fun `should list files`() {
         repository.store("test1", "This is a test")
         val byteArray: ByteArray = "Hello world".toByteArray()
-        repository.storeBytes("test2", byteArray)
+        repository.storeBytes("test2", byteArray, null)
 
         val fileNames = repository.ls()
 
@@ -55,7 +69,7 @@ class DefaultStorageRepositoryTest {
     fun `should get number of files`() {
         repository.store("test1", "This is a test")
         val byteArray: ByteArray = "Hello world".toByteArray()
-        repository.storeBytes("test2", byteArray)
+        repository.storeBytes("test2", byteArray, null)
 
         assertEquals(2, repository.lsc())
     }
