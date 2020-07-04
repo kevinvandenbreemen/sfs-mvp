@@ -3,6 +3,7 @@ package com.vandenbreemen.mobilesecurestoragemvp.wrapper
 import com.vandenbreemen.mobilesecurestorage.file.ImportedFileData
 import com.vandenbreemen.mobilesecurestorage.security.crypto.persistence.SecureFileSystem
 import java.io.Serializable
+import java.util.*
 
 /**
  * Abstraction from on-disk storage
@@ -13,6 +14,7 @@ interface StorageRepository {
     fun load(fileName: String): Any
     fun storeBytes(fileName: String, byteArray: ByteArray)
     fun loadBytes(fileName: String): ByteArray?
+    fun ls(): List<String>
 
 }
 
@@ -32,5 +34,9 @@ class DefaultStorageRepository(private val secureFileSystem: SecureFileSystem) :
 
     override fun loadBytes(fileName: String): ByteArray? {
         return secureFileSystem.loadAndCacheBytesFromFile(fileName)
+    }
+
+    override fun ls(): List<String> {
+        return Collections.unmodifiableList(secureFileSystem.listFiles())
     }
 }
