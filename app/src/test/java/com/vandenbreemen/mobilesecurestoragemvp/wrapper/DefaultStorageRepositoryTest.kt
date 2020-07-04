@@ -1,5 +1,6 @@
 package com.vandenbreemen.mobilesecurestoragemvp.wrapper
 
+import com.vandenbreemen.mobilesecurestorage.file.api.FileTypes
 import com.vandenbreemen.mobilesecurestoragemvp.wrapper.error.RepositoryRuntime
 import com.vandenbreemen.sfs_test_utils.SFSTestingUtils
 import junit.framework.TestCase.*
@@ -65,6 +66,21 @@ class DefaultStorageRepositoryTest {
         repository.mv("test1", "renamed")
         val storedData = repository.load("renamed")
         assertEquals("This is a test", storedData)
+    }
+
+    @Test
+    fun `should store with file type`() {
+        repository.store("test1", "This is a test", FileTypes.DATA)
+        repository.store("test2", "This is a test")
+
+        val files = repository.ls(FileTypes.DATA)
+        assertEquals(1, files.size)
+        assertTrue(files.contains("test1"))
+
+        val storedData = repository.load("test1")
+        assertEquals("This is a test", storedData)
+
+        assertEquals(1, repository.lsc(FileTypes.DATA))
     }
 
     @Test

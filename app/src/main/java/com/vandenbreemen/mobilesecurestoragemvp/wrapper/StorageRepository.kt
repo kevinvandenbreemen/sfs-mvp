@@ -1,6 +1,10 @@
 package com.vandenbreemen.mobilesecurestoragemvp.wrapper
 
 import com.vandenbreemen.mobilesecurestorage.file.ImportedFileData
+import com.vandenbreemen.mobilesecurestorage.file.api.FileType
+import com.vandenbreemen.mobilesecurestorage.file.api.FileTypes
+import com.vandenbreemen.mobilesecurestorage.file.api.SecureFileSystemInteractor
+import com.vandenbreemen.mobilesecurestorage.file.api.SecureFileSystemInteractorFactory
 import com.vandenbreemen.mobilesecurestorage.security.crypto.persistence.SecureFileSystem
 import com.vandenbreemen.mobilesecurestoragemvp.wrapper.error.RepositoryRuntime
 import java.io.Serializable
@@ -11,12 +15,12 @@ import java.util.*
  * @author kevin
  */
 interface StorageRepository {
-    fun store(fileName: String, data: Serializable)
+    fun store(fileName: String, data: Serializable, fileType: FileType? = null)
     fun load(fileName: String): Any
     fun storeBytes(fileName: String, byteArray: ByteArray)
     fun loadBytes(fileName: String): ByteArray?
-    fun ls(): List<String>
-    fun lsc(): Int
+    fun ls(fileType: FileType? = null): List<String>
+    fun lsc(fileType: FileTypes? = null): Int
 
     /**
      * Unmount the file system.  The StorageRepository will no longer be usable!
@@ -28,6 +32,8 @@ interface StorageRepository {
 
 class DefaultStorageRepository(private var secureFileSystem: SecureFileSystem?) : StorageRepository {
 
+    private var interactor: SecureFileSystemInteractor = SecureFileSystemInteractorFactory.get(secureFileSystem!!)
+
     @Throws(RepositoryRuntime::class)
     private fun checkMounted() {
         if(secureFileSystem == null) {
@@ -35,8 +41,14 @@ class DefaultStorageRepository(private var secureFileSystem: SecureFileSystem?) 
         }
     }
 
-    override fun store(fileName: String, data: Serializable) {
+    override fun store(fileName: String, data: Serializable, fileType: FileType?) {
         checkMounted()
+
+        fileType?.let { ft->
+            interactor.save(data, fileName, ft)
+            return
+        }
+
         secureFileSystem!!.storeObject(fileName, data)
     }
 
@@ -56,14 +68,25 @@ class DefaultStorageRepository(private var secureFileSystem: SecureFileSystem?) 
         return secureFileSystem!!.loadAndCacheBytesFromFile(fileName)
     }
 
-    override fun ls(): List<String> {
+    override fun ls(fileType: FileType?): List<String> {
         checkMounted()
+
+        fileType?.let { ft->
+            return secureFileSystem!!.listFiles().filter { fileName->
+                val details = secureFileSystem!!.getDetails(fileName)
+                details.fileMeta?.let { meta->
+                    ft == meta.getFileType()
+                } ?: false
+
+            }
+        }
+
         return Collections.unmodifiableList(secureFileSystem!!.listFiles())
     }
 
-    override fun lsc(): Int {
+    override fun lsc(fileType: FileTypes?): Int {
         checkMounted()
-        return secureFileSystem!!.listFiles().count()
+        return ls(fileType).count()
     }
 
     override fun unmount() {
