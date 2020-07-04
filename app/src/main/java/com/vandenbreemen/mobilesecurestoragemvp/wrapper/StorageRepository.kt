@@ -1,5 +1,6 @@
 package com.vandenbreemen.mobilesecurestoragemvp.wrapper
 
+import com.vandenbreemen.mobilesecurestorage.file.ImportedFileData
 import com.vandenbreemen.mobilesecurestorage.security.crypto.persistence.SecureFileSystem
 import java.io.Serializable
 
@@ -10,6 +11,9 @@ import java.io.Serializable
 interface StorageRepository {
     fun store(fileName: String, data: Serializable)
     fun load(fileName: String): Any
+    fun storeBytes(fileName: String, byteArray: ByteArray)
+    fun loadBytes(fileName: String): ByteArray?
+
 }
 
 class DefaultStorageRepository(private val secureFileSystem: SecureFileSystem) : StorageRepository {
@@ -21,5 +25,12 @@ class DefaultStorageRepository(private val secureFileSystem: SecureFileSystem) :
         return secureFileSystem.loadFile(fileName)
     }
 
+    override fun storeBytes(fileName: String, byteArray: ByteArray) {
+        val importedData = ImportedFileData(byteArray)
+        secureFileSystem.storeObject(fileName, importedData)
+    }
 
+    override fun loadBytes(fileName: String): ByteArray? {
+        return secureFileSystem.loadBytesFromFile(fileName)
+    }
 }
