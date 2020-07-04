@@ -22,7 +22,7 @@ class DefaultStorageRepository(private val secureFileSystem: SecureFileSystem) :
     }
 
     override fun load(fileName: String): Any {
-        return secureFileSystem.loadFile(fileName)
+        return secureFileSystem.loadAndCacheFile(fileName)
     }
 
     override fun storeBytes(fileName: String, byteArray: ByteArray) {
