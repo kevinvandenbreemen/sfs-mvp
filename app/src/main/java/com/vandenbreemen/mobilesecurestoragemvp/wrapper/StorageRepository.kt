@@ -27,6 +27,7 @@ interface StorageRepository {
      */
     fun unmount()
     fun mv(currentName: String, newName: String)
+    fun delete(vararg fileNames: String)
 
 }
 
@@ -107,5 +108,10 @@ class DefaultStorageRepository(private var secureFileSystem: SecureFileSystem?) 
     override fun mv(currentName: String, newName: String) {
         checkMounted()
         secureFileSystem!!.rename(currentName, newName)
+    }
+
+    override fun delete(vararg fileNames: String) {
+        checkMounted()
+        secureFileSystem!!.deleteFiles(*fileNames)
     }
 }

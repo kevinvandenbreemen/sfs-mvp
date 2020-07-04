@@ -98,6 +98,23 @@ class DefaultStorageRepositoryTest {
     }
 
     @Test
+    fun `should delete files`() {
+        repository.store("test2", "This is a test")
+        repository.delete("test2")
+
+        assertEquals(0, repository.lsc())
+    }
+
+    @Test
+    fun `should delete multiple files`() {
+        repository.store("test2", "This is a test")
+        repository.store("test1", "This is a test")
+        repository.delete("test2", "test1")
+
+        assertEquals(0, repository.lsc())
+    }
+
+    @Test
     fun `Should unmount`() {
         repository.store("test1", "This is a test")
         repository.unmount()
