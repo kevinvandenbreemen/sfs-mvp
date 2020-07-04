@@ -15,6 +15,7 @@ interface StorageRepository {
     fun storeBytes(fileName: String, byteArray: ByteArray)
     fun loadBytes(fileName: String): ByteArray?
     fun ls(): List<String>
+    fun lsc(): Int
 
 }
 
@@ -38,5 +39,9 @@ class DefaultStorageRepository(private val secureFileSystem: SecureFileSystem) :
 
     override fun ls(): List<String> {
         return Collections.unmodifiableList(secureFileSystem.listFiles())
+    }
+
+    override fun lsc(): Int {
+        return secureFileSystem.listFiles().count()
     }
 }

@@ -50,4 +50,13 @@ class DefaultStorageRepositoryTest {
         assertTrue(fileNames.contains("test2"))
     }
 
+    @Test
+    fun `should get number of files`() {
+        repository.store("test1", "This is a test")
+        val byteArray: ByteArray = "Hello world".toByteArray()
+        repository.storeBytes("test2", byteArray)
+
+        assertEquals(2, repository.lsc())
+    }
+
 }
