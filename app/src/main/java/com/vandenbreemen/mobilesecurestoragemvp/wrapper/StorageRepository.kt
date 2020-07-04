@@ -31,6 +31,6 @@ class DefaultStorageRepository(private val secureFileSystem: SecureFileSystem) :
     }
 
     override fun loadBytes(fileName: String): ByteArray? {
-        return secureFileSystem.loadBytesFromFile(fileName)
+        return secureFileSystem.loadAndCacheBytesFromFile(fileName)
     }
 }
