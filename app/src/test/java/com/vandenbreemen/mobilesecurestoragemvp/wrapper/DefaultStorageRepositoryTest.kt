@@ -40,6 +40,24 @@ class DefaultStorageRepositoryTest {
     }
 
     @Test
+    fun `should update the contents of a file`() {
+        repository.store("test1", "This is a test")
+        repository.store("test1", "UPDATE")
+        val storedData = repository.load("test1")
+        assertEquals("UPDATE", storedData)
+    }
+
+    @Test
+    fun `should update byte array in same file`() {
+        val byteArray: ByteArray = "Hello world".toByteArray()
+        repository.storeBytes("test1", byteArray, null)
+        repository.storeBytes("test1", "updated".toByteArray(), null)
+        val storedData = repository.loadBytes("test1")
+
+        assertArrayEquals(storedData, "updated".toByteArray())
+    }
+
+    @Test
     fun `should store byte array with file type`() {
         val byteArray: ByteArray = "Hello world".toByteArray()
         repository.storeBytes("test1", byteArray, FileTypes.SYSTEM)
