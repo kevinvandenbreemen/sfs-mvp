@@ -3,20 +3,23 @@ package com.vandenbreemen.mobilesecurestoragemvp
 import com.vandenbreemen.mobilesecurestorage.android.sfs.SFSCredentials
 import com.vandenbreemen.mobilesecurestorage.security.SecureString
 import com.vandenbreemen.mobilesecurestorage.security.crypto.persistence.SecureFileSystem
+import com.vandenbreemen.mobilesecurestoragemvp.wrapper.DefaultStorageRepository
+import com.vandenbreemen.mobilesecurestoragemvp.wrapper.StorageRepository
 import com.vandenbreemen.standardandroidlogging.log.SystemLog
 
 abstract class Model(private val credentials: SFSCredentials) {
 
-    protected lateinit var sfs:SecureFileSystem
+    protected lateinit var storage:StorageRepository
 
     @Throws
     fun init() {
         try {
-            this.sfs = object : SecureFileSystem(credentials.fileLocation) {
+            val sfs = object : SecureFileSystem(credentials.fileLocation) {
                 override fun getPassword(): SecureString? {
                     return credentials.password
                 }
             }
+            this.storage = DefaultStorageRepository(sfs)
 
             this.setup()
         } catch (exception: Exception) {
@@ -30,8 +33,8 @@ abstract class Model(private val credentials: SFSCredentials) {
             return
         }
         credentials.finalize()
-        if(::sfs.isInitialized) {
-            sfs.close()
+        if(::storage.isInitialized) {
+            storage.unmount()
         }
 
         onClose()

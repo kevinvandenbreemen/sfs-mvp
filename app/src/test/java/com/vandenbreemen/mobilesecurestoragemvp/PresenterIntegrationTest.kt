@@ -34,7 +34,7 @@ class TestModel(credentials: SFSCredentials): Model(credentials) {
     }
 
     fun listFiles(): List<String> {
-        return sfs.listFiles()
+        return storage.ls()
     }
 
 }
