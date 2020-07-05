@@ -12,6 +12,11 @@ interface StorageRepositoryProvider {
 
     fun getRepository(credentials: SFSCredentials): StorageRepository
 
+    /**
+     * Unmounts any storage repositories this provider may have mounted.  This will render them un-usable.
+     */
+    fun destroy()
+
 }
 
 class DefaultStorageRepositoryProvider: StorageRepositoryProvider {
@@ -33,5 +38,12 @@ class DefaultStorageRepositoryProvider: StorageRepositoryProvider {
         }
 
 
+    }
+
+    override fun destroy() {
+        repository?.apply {
+            unmount()
+            repository = null
+        }
     }
 }
