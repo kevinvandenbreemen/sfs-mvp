@@ -155,6 +155,23 @@ class DefaultStorageRepositoryTest {
     }
 
     @Test
+    fun `should let you import files with a file type`() {
+        val path = "src/test/resource/testdata.dat"
+        val testFile = File(path)
+        assertTrue(testFile.exists())
+
+        repository.import(path, "test1", FileTypes.DATA)
+        repository.store("test2", "This is a test")
+        assertEquals(1, repository.lsc(FileTypes.DATA))
+
+        val data = repository.loadBytes("test1")
+
+        val string = String(data!!)
+        assertEquals("THIS IS A TEST", string)
+
+    }
+
+    @Test
     fun `should check if file exists`() {
         assertFalse(repository.f("test1"))
         repository.store("test1", "This is a test", FileTypes.DATA)

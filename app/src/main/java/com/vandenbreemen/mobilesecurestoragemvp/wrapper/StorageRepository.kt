@@ -29,7 +29,7 @@ interface StorageRepository {
     fun mv(currentName: String, newName: String)
     fun delete(vararg fileNames: String)
     fun stat(fileName: String): FileInfo
-    fun import(fileName: String, destinationFileName: String)
+    fun import(fileName: String, destinationFileName: String, fileType: FileType? = null)
     fun f(fileName: String): Boolean
 
 }
@@ -126,13 +126,13 @@ class DefaultStorageRepository(private var secureFileSystem: SecureFileSystem?) 
         return interactor.info(fileName)
     }
 
-    override fun import(fileName: String, destinationFileName: String) {
+    override fun import(fileName: String, destinationFileName: String, fileType: FileType?) {
         val file = File(fileName)
         if(!file.exists()){
             return
         }
         val data = fileLoader.loadFile(file)
-        interactor.importToFile(data, destinationFileName, null)
+        interactor.importToFile(data, destinationFileName, fileType)
     }
 
     override fun unmount() {
