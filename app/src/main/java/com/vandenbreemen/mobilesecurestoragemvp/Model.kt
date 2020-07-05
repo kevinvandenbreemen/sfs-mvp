@@ -26,9 +26,6 @@ abstract class Model(private val credentials: SFSCredentials, private val provid
             return
         }
         credentials.finalize()
-        if(::storage.isInitialized) {
-            storage.unmount()
-        }
 
         onClose()
     }
@@ -45,7 +42,7 @@ abstract class Model(private val credentials: SFSCredentials, private val provid
         return credentials.copy()
     }
 
-    private fun isClosed(): Boolean {
+    fun isClosed(): Boolean {
         return credentials.finalized()
     }
 

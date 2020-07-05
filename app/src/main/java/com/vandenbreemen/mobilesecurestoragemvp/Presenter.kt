@@ -25,6 +25,9 @@ abstract class Presenter<MODEL: Model, VIEW: View>(private val model: MODEL, pri
      */
     fun start() {
         try {
+            if(model.isClosed()) {
+                throw ApplicationError("Model has been closed and cannot be re-used")
+            }
             model.init()
             setupView()
         } catch (exception: Exception) {

@@ -71,29 +71,6 @@ class PresenterIntegrationTest {
     }
 
     @Test
-    fun `Close properly closes out SFS etc`() {
-
-        //  Arrange
-        val file = SFSTestingUtils.getTestFile("testFile_${System.nanoTime()}")
-        val sfs = SFSTestingUtils.getNewSecureFileSystem(file)
-        sfs.touch("testFile1")
-        val credentials = SFSCredentials(file,
-            SecureFileSystem.generatePassword(SecureString("password123".toByteArray())))
-
-        val model = TestModel(credentials, DefaultStorageRepositoryProvider())
-        val view = TestView()
-        val presenter = TestPresenter(model, view)
-        presenter.start()
-        presenter.close()
-
-        //  Act
-        presenter.start()
-
-        //  Assert
-        assertNotNull(view.error)
-    }
-
-    @Test
     fun `Copy Credentials is Resistant to Model Finalizer`() {
         //  Arrange
         val file = SFSTestingUtils.getTestFile("testFile_${System.nanoTime()}")

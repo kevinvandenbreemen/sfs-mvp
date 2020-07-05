@@ -45,6 +45,7 @@ abstract class PresenterManager {
     fun destroy() {
         presenters.forEach { it.close() }
         presenters.clear()
+        storageRepositoryProvider.destroy()
     }
 
 }
