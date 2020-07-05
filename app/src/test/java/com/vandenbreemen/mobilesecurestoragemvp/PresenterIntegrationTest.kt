@@ -109,4 +109,26 @@ class PresenterIntegrationTest {
         assertEquals(listOf("testFile1"), view.sfsFileList)
         assertNull(view.error)
     }
+
+
+    @Test
+    fun `Close does not close storage`() {
+
+        //  Arrange
+        val file = SFSTestingUtils.getTestFile("testFile_${System.nanoTime()}")
+        val sfs = SFSTestingUtils.getNewSecureFileSystem(file)
+        sfs.touch("testFile1")
+        val credentials = SFSCredentials(file,
+            SecureFileSystem.generatePassword(SecureString("password123".toByteArray())))
+
+        val storageProvider = DefaultStorageRepositoryProvider()
+        val model = TestModel(credentials, storageProvider)
+        val view = TestView()
+        val presenter = TestPresenter(model, view)
+        presenter.start()
+        presenter.close()
+
+        //  Act/Assert (if this crashes the test is a failure)
+        storageProvider.getRepository(credentials).ls()
+    }
 }
