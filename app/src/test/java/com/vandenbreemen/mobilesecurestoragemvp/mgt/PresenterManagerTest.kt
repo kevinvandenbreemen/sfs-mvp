@@ -7,17 +7,16 @@ import com.vandenbreemen.mobilesecurestoragemvp.Presenter
 import com.vandenbreemen.mobilesecurestoragemvp.TestModel
 import com.vandenbreemen.mobilesecurestoragemvp.TestPresenter
 import com.vandenbreemen.mobilesecurestoragemvp.TestView
+import com.vandenbreemen.mobilesecurestoragemvp.wrapper.StorageRepositoryProvider
 import com.vandenbreemen.sfs_test_utils.SFSTestingUtils
-import junit.framework.TestCase
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.fail
 import org.junit.Test
-
-import org.junit.Assert.*
-import java.lang.RuntimeException
 
 class TestPresenterManager: PresenterManager() {
 
-    override fun buildPresenters(credentials: SFSCredentials) {
-        val testPresenter = TestPresenterWithNoView(TestModel(credentials))
+    override fun buildPresenters(credentials: SFSCredentials, provider: StorageRepositoryProvider) {
+        val testPresenter = TestPresenterWithNoView(TestModel(credentials, provider))
         addPresenter(testPresenter)
     }
 }
@@ -46,7 +45,7 @@ class PresenterManagerTest {
         val manager = TestPresenterManager()
 
         //  Act
-        manager.buildPresenters(credentials)
+        manager.build(credentials)
     }
 
     @Test
@@ -58,7 +57,7 @@ class PresenterManagerTest {
         val credentials = SFSCredentials(file,
             SecureFileSystem.generatePassword(SecureString("password123".toByteArray())))
         val manager = TestPresenterManager()
-        manager.buildPresenters(credentials)
+        manager.build(credentials)
 
         //  Act
         val presenter: TestPresenterWithNoView = manager.getPresenter()
@@ -77,13 +76,13 @@ class PresenterManagerTest {
         val credentials = SFSCredentials(file,
             SecureFileSystem.generatePassword(SecureString("password123".toByteArray())))
         val manager = TestPresenterManager()
-        manager.buildPresenters(credentials)
+        manager.build(credentials)
         val presenter: TestPresenterWithNoView = manager.getPresenter()
         val view = TestView()
         presenter.setView(view)
 
         presenter.start()
-        manager.destroyPresenters()
+        manager.destroy()
 
         //  Act
         presenter.start()
@@ -101,14 +100,14 @@ class PresenterManagerTest {
         val credentials = SFSCredentials(file,
             SecureFileSystem.generatePassword(SecureString("password123".toByteArray())))
         val manager = TestPresenterManager()
-        manager.buildPresenters(credentials)
+        manager.build(credentials)
         var presenter: TestPresenterWithNoView = manager.getPresenter()
         val view = TestView()
         presenter.setView(view)
 
         presenter.start()
 
-        manager.destroyPresenters()
+        manager.destroy()
 
         //  Act
         presenter = manager.getPresenter()
@@ -127,8 +126,8 @@ class PresenterManagerTest {
         val credentials = SFSCredentials(file,
             SecureFileSystem.generatePassword(SecureString("password123".toByteArray())))
         val manager = TestPresenterManager()
-        manager.buildPresenters(credentials)
-        manager.destroyPresenters()
+        manager.build(credentials)
+        manager.destroy()
 
         //  Act
         try {
@@ -152,7 +151,7 @@ class PresenterManagerTest {
         val credentials = SFSCredentials(file,
             SecureFileSystem.generatePassword(SecureString("password123".toByteArray())))
         val manager = TestPresenterManager()
-        manager.buildPresenters(credentials)
+        manager.build(credentials)
 
         //  Act
         val presenter: TestPresenter = manager.getPresenter()

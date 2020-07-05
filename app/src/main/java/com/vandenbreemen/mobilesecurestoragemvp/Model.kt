@@ -1,25 +1,18 @@
 package com.vandenbreemen.mobilesecurestoragemvp
 
 import com.vandenbreemen.mobilesecurestorage.android.sfs.SFSCredentials
-import com.vandenbreemen.mobilesecurestorage.security.SecureString
-import com.vandenbreemen.mobilesecurestorage.security.crypto.persistence.SecureFileSystem
-import com.vandenbreemen.mobilesecurestoragemvp.wrapper.DefaultStorageRepository
 import com.vandenbreemen.mobilesecurestoragemvp.wrapper.StorageRepository
+import com.vandenbreemen.mobilesecurestoragemvp.wrapper.StorageRepositoryProvider
 import com.vandenbreemen.standardandroidlogging.log.SystemLog
 
-abstract class Model(private val credentials: SFSCredentials) {
+abstract class Model(private val credentials: SFSCredentials, private val provider: StorageRepositoryProvider) {
 
     protected lateinit var storage:StorageRepository
 
     @Throws
     fun init() {
         try {
-            val sfs = object : SecureFileSystem(credentials.fileLocation) {
-                override fun getPassword(): SecureString? {
-                    return credentials.password
-                }
-            }
-            this.storage = DefaultStorageRepository(sfs)
+            this.storage = provider.getRepository(credentials)
 
             this.setup()
         } catch (exception: Exception) {

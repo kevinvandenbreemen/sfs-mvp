@@ -5,6 +5,8 @@ import com.vandenbreemen.mobilesecurestorage.message.ApplicationError
 import com.vandenbreemen.mobilesecurestorage.security.SecureString
 import com.vandenbreemen.mobilesecurestorage.security.crypto.persistence.SecureFileSystem
 import com.vandenbreemen.mobilesecurestoragemvp.mgt.TestPresenterWithNoView
+import com.vandenbreemen.mobilesecurestoragemvp.wrapper.DefaultStorageRepositoryProvider
+import com.vandenbreemen.mobilesecurestoragemvp.wrapper.StorageRepositoryProvider
 import com.vandenbreemen.sfs_test_utils.SFSTestingUtils
 import junit.framework.TestCase.*
 import org.junit.Test
@@ -24,7 +26,7 @@ class TestView: View {
 
 }
 
-class TestModel(credentials: SFSCredentials): Model(credentials) {
+class TestModel(credentials: SFSCredentials, storageRepositoryProvider: StorageRepositoryProvider): Model(credentials, storageRepositoryProvider) {
     override fun onClose() {
 
     }
@@ -53,13 +55,13 @@ class PresenterIntegrationTest {
 
     @Test
     fun `Startup Functions Properly`() {
-        val file = SFSTestingUtils.getTestFile("testFile")
+        val file = SFSTestingUtils.getTestFile("testFile_${System.nanoTime()}")
         val sfs = SFSTestingUtils.getNewSecureFileSystem(file)
         sfs.touch("testFile1")
         val credentials = SFSCredentials(file,
             SecureFileSystem.generatePassword(SecureString("password123".toByteArray())))
 
-        val model = TestModel(credentials)
+        val model = TestModel(credentials, DefaultStorageRepositoryProvider())
         val view = TestView()
         val presenter = TestPresenter(model, view)
         presenter.start()
@@ -72,13 +74,13 @@ class PresenterIntegrationTest {
     fun `Close properly closes out SFS etc`() {
 
         //  Arrange
-        val file = SFSTestingUtils.getTestFile("testFile")
+        val file = SFSTestingUtils.getTestFile("testFile_${System.nanoTime()}")
         val sfs = SFSTestingUtils.getNewSecureFileSystem(file)
         sfs.touch("testFile1")
         val credentials = SFSCredentials(file,
             SecureFileSystem.generatePassword(SecureString("password123".toByteArray())))
 
-        val model = TestModel(credentials)
+        val model = TestModel(credentials, DefaultStorageRepositoryProvider())
         val view = TestView()
         val presenter = TestPresenter(model, view)
         presenter.start()
@@ -94,13 +96,13 @@ class PresenterIntegrationTest {
     @Test
     fun `Copy Credentials is Resistant to Model Finalizer`() {
         //  Arrange
-        val file = SFSTestingUtils.getTestFile("testFile")
+        val file = SFSTestingUtils.getTestFile("testFile_${System.nanoTime()}")
         val sfs = SFSTestingUtils.getNewSecureFileSystem(file)
         sfs.touch("testFile1")
         val credentials = SFSCredentials(file,
             SecureFileSystem.generatePassword(SecureString("password123".toByteArray())))
 
-        val model = TestModel(credentials)
+        val model = TestModel(credentials, DefaultStorageRepositoryProvider())
         val view = TestView()
         val presenter = TestPresenter(model, view)
         presenter.start()
@@ -115,13 +117,13 @@ class PresenterIntegrationTest {
 
     @Test
     fun `Can set Views Later`() {
-        val file = SFSTestingUtils.getTestFile("testFile")
+        val file = SFSTestingUtils.getTestFile("testFile_${System.nanoTime()}")
         val sfs = SFSTestingUtils.getNewSecureFileSystem(file)
         sfs.touch("testFile1")
         val credentials = SFSCredentials(file,
             SecureFileSystem.generatePassword(SecureString("password123".toByteArray())))
 
-        val model = TestModel(credentials)
+        val model = TestModel(credentials, DefaultStorageRepositoryProvider())
         val view = TestView()
         val presenter = TestPresenterWithNoView(model)
         presenter.setView(view)

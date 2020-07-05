@@ -2,7 +2,8 @@ package com.vandenbreemen.mobilesecurestoragemvp.mgt
 
 import com.vandenbreemen.mobilesecurestorage.android.sfs.SFSCredentials
 import com.vandenbreemen.mobilesecurestoragemvp.Presenter
-import java.lang.RuntimeException
+import com.vandenbreemen.mobilesecurestoragemvp.wrapper.DefaultStorageRepositoryProvider
+import com.vandenbreemen.mobilesecurestoragemvp.wrapper.StorageRepositoryProvider
 
 /**
  * Builds and manages presenters, deleting and re-creating them etc.  Use this type whenever possible
@@ -15,10 +16,16 @@ abstract class PresenterManager {
     @PublishedApi
     internal val presenters: MutableList<Presenter<*, *>> = mutableListOf()
 
+    private var storageRepositoryProvider: StorageRepositoryProvider = DefaultStorageRepositoryProvider()
+
+    fun build(credentials: SFSCredentials) {
+        buildPresenters(credentials, storageRepositoryProvider)
+    }
+
     /**
      * Create the presenters this manager manages
      */
-    abstract fun buildPresenters(credentials: SFSCredentials)
+    abstract fun buildPresenters(credentials: SFSCredentials, provider: StorageRepositoryProvider)
 
     /**
      * Adds the given presenter to the list of presenters being managed
@@ -35,7 +42,7 @@ abstract class PresenterManager {
         }
     }
 
-    fun destroyPresenters() {
+    fun destroy() {
         presenters.forEach { it.close() }
         presenters.clear()
     }
