@@ -64,4 +64,25 @@ class DefaultStorageRepositoryProviderTest {
         }
     }
 
+    @Test
+    fun `should not allow access to repository using finalized credentials`() {
+        val file = SFSTestingUtils.getTestFile("testFile")
+        val sfs = SFSTestingUtils.getNewSecureFileSystem(file)
+        sfs.touch("testFile1")
+        val credentials = SFSCredentials(file,
+            SecureFileSystem.generatePassword(SecureString("password123".toByteArray())))
+
+        val provider = DefaultStorageRepositoryProvider()
+        provider.getRepository(credentials) //  Given:  Repository has previously been stood up!
+
+        credentials.finalize()
+
+        try {
+            val reOpened = provider.getRepository(credentials)
+            fail("Should not be allowed")
+        } catch(ex: java.lang.Exception) {
+            ex.printStackTrace()
+        }
+    }
+
 }

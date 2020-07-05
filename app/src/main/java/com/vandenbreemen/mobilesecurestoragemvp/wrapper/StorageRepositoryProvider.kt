@@ -3,6 +3,7 @@ package com.vandenbreemen.mobilesecurestoragemvp.wrapper
 import com.vandenbreemen.mobilesecurestorage.android.sfs.SFSCredentials
 import com.vandenbreemen.mobilesecurestorage.security.SecureString
 import com.vandenbreemen.mobilesecurestorage.security.crypto.persistence.SecureFileSystem
+import com.vandenbreemen.mobilesecurestoragemvp.wrapper.error.RepositoryRuntime
 
 /**
  *
@@ -24,6 +25,10 @@ class DefaultStorageRepositoryProvider: StorageRepositoryProvider {
     private var repository: StorageRepository? = null
 
     override fun getRepository(credentials: SFSCredentials): StorageRepository {
+
+        if(credentials.password.isFinalized) {
+            throw RepositoryRuntime("Credentials are no longer valid and cannot be used to access a storage repository")
+        }
 
         repository?.let {
             return it

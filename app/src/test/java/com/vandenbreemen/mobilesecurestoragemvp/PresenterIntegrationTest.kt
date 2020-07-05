@@ -125,10 +125,13 @@ class PresenterIntegrationTest {
         val model = TestModel(credentials, storageProvider)
         val view = TestView()
         val presenter = TestPresenter(model, view)
+
+        val reposistory = storageProvider.getRepository(credentials)
+
         presenter.start()
         presenter.close()
 
         //  Act/Assert (if this crashes the test is a failure)
-        storageProvider.getRepository(credentials).ls()
+        reposistory.ls()
     }
 }
